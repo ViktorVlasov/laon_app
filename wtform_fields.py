@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 
 from passlib.hash import pbkdf2_sha256
-from models import User
+from models import User, Deck
 
 
 def invalid_credentials(form, field):
@@ -39,3 +39,13 @@ class LoginForm(FlaskForm):
 
     username = StringField('username', validators=[InputRequired(message="Username required")])
     password = PasswordField('password', validators=[InputRequired(message="Password required"), invalid_credentials])
+
+
+class DeckForm(FlaskForm):
+    """ Form for create deck"""
+
+    deck_name = StringField('deck_name', validators=[InputRequired(message="Username required"), Length(min=1, max=25, message="Username must be between 1 and 25 characters")])
+    def validate_deck_name(self, deck_name):
+        user_object = Deck.query.filter_by(deck_name=deck_name.data).first()
+        if user_object:
+            raise ValidationError("Deck name already exists. Select a different deck name.")

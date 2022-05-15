@@ -10,7 +10,7 @@ app.secret_key = 'replace later'
 
 # Configure database
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://cbbydgxbphirfb:8561383db67f859da3fa51809c2d6a3f27970a8e6e46ccffe5a2a713ddf54b06@ec2-63-32-248-14.eu-west-1.compute.amazonaws.com:5432/dd6qsh2q8nbr1e'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Initialize login manager
@@ -38,7 +38,7 @@ def index():
         db.session.add(user)
         db.session.commit()
 
-        # flash('Registered successfully. Please login.', 'success')
+        flash('Registered successfully. Please login.', 'success')
         return redirect(url_for('login'))
 
     return render_template("index.html", form=reg_form)
@@ -52,9 +52,35 @@ def login():
     if login_form.validate_on_submit():
         user_object = User.query.filter_by(username=login_form.username.data).first()
         login_user(user_object)
-        return redirect(url_for('chat'))
+        return redirect(url_for('decks'))
 
     return render_template("login.html", form=login_form)
+
+
+@app.route("/decks", methods=['GET', 'POST'])
+def decks():
+    if not current_user.is_authenticated:
+        flash('Please login', 'danger')
+        return redirect(url_for('login'))
+
+    deck_form = DeckForm()
+    user_id = int(current_user.get_id())
+
+    if (request.method == "POST") and deck_form.validate_on_submit():
+        deck_name = deck_form.deck_name.data
+
+        # add deck_name with user_id to db
+        deck = Deck(deck_name=deck_name, user_id=user_id)
+        db.session.add(deck)
+        db.session.commit()
+        flash(f'Deck with name {deck_name} created.', 'success')
+        # return render_template("decks.html", form=deck_form)
+
+    user_decks = [deck.deck_name for deck in User.query.get(user_id).decks]
+
+    # Способ отобразить колоды
+    # print(User.query.get(3).decks[0].deck_name)
+    return render_template("decks.html", form=deck_form, user_decks=user_decks)
 
 @app.route("/logout", methods=['GET'])
 def logout():
@@ -63,17 +89,6 @@ def logout():
     logout_user()
     flash('You have logged out successfully', 'success')
     return redirect(url_for('login'))
-
-
-@app.route("/chat", methods=['GET', 'POST'])
-def chat():
-
-    if not current_user.is_authenticated:
-        flash('Please login', 'danger')
-        return redirect(url_for('login'))
-
-    return "Test card"
-    #return render_template("chat.html", username=current_user.username, rooms=ROOMS)
 
 
 if __name__ == '__main__':

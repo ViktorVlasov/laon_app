@@ -4,19 +4,25 @@
 {% block title %}Login {% endblock %}
 
 {% block content %}
-    <h2>Login now!</h2>
-    <p>Enter you username/password to start.</p>
+    <main class="text-center form-signin container col-4">
+        <h2 class="h3 mb-3">Авторизация</h2>
+        <p>Введите ваш логин и пароль, чтобы начать.</p>
 
-    <form action="{{ url_for('login') }}", method="POST">
-        {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true) }}
-        {{ displayField(form.password, 'Password') }}
+        <form action="{{ url_for('login') }}", method="POST">
+            {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true) }}
+            {{ displayField(form.password, 'Password') }}
+            <div class="form-group">
+                <input type="submit" value="Login" class="w-100 btn btn-lg btn-primary">
+            </div>
+            {{ form.csrf_token }}
+        </form>
+
+        <hr>
+        <p>У вас нет аккаунта?</p>
         <div class="form-group">
-            <input type="submit" value="Login" class="btn btn-warning">
+            <a href={{url_for('index')}} class="btn btn-outline-primary">Создать аккаунт</a>
         </div>
-        {{ form.csrf_token }}
-    </form>
+    </main>
 
-    <hr>
 
-    <p>Have not registered? <a href={{url_for('index')}}>Register here</a>.</p>
 {% endblock %}

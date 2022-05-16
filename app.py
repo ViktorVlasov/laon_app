@@ -34,8 +34,8 @@ def index():
         hashed_pswd = pbkdf2_sha256.hash(password)
 
         # add user with hashed password to db
-        user = User(username=username, password=hashed_pswd)
-        db.session.add(user)
+        user_object = User(username=username, password=hashed_pswd)
+        db.session.add(user_object)
         db.session.commit()
 
         flash('Registered successfully. Please login.', 'success')
@@ -70,8 +70,8 @@ def decks():
         deck_name = deck_form.deck_name.data
 
         # add deck_name with user_id to db
-        deck = Deck(deck_name=deck_name, user_id=user_id)
-        db.session.add(deck)
+        deck_object = Deck(deck_name=deck_name, user_id=user_id)
+        db.session.add(deck_object)
         db.session.commit()
         flash(f'Deck with name {deck_name} created.', 'success')
         # return render_template("decks.html", form=deck_form)
@@ -81,6 +81,20 @@ def decks():
     # Способ отобразить колоды
     # print(User.query.get(3).decks[0].deck_name)
     return render_template("decks.html", form=deck_form, user_decks=user_decks)
+
+@app.route("/delete", methods=['POST'])
+def delete():
+    # Delete deck
+    if request.form.get('delete'):
+        deck_name = request.form.get('delete')
+        deck_object = Deck.query.filter_by(deck_name=deck_name).first()
+        # print()
+
+        u = db.session.get(Deck, deck_object.id)
+        db.session.delete(u)
+        db.session.commit()
+        # return "test"
+        return redirect(url_for('decks'))
 
 @app.route("/logout", methods=['GET'])
 def logout():

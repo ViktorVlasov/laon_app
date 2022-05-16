@@ -4,19 +4,25 @@
 {% block title %}Register {% endblock title%}
 
 {% block content %}
-        <h2>Get started!</h2>
-        <p>First time here? Register to start using Laon</p>
+    <main class="text-center form-signin container col-4">
+        <h2>Регистрация</h2>
+        <p>Первый раз здесь? Зарегистрируйтесь, чтобы использовать Laon!</p>
 
         <form action="{{ url_for('index') }}", method="POST">
             {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true) }}
             {{ displayField(form.password, 'Password') }}
             {{ displayField(form.confirm_pswd, 'Retype Password') }}
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-warning">
+                <input type="submit" value="Создать" class="w-100 btn btn-lg btn-primary">
             </div>
             {{ form.csrf_token }}
         </form>
 
         <hr>
+        <p>Уже есть аккаунт?</p>
+        <div class="form-group">
+            <a href={{url_for('login')}} class="btn btn-outline-primary">Войти</a>
+        </div>
 
+    </main>
 {% endblock %}

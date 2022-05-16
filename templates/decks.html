@@ -1,26 +1,51 @@
 {% from 'field-macro.html' import displayField %}
+{% from 'nav-macro.html' import displayNav %}
 {% extends "prelogin-layout.html" %}
 
 {% block title %}Decks {% endblock %}
 
 {% block content %}
-    <h2>Decks!</h2>
-    <p>All your decks:</p>
-    <ul>
-    {# в цикле проходимся по контексту `context.users` #}
-    {% for deck in user_decks %}
-    <li>{{ deck }}</li>
-    {% endfor %}
-    </ul>
-
-    <p>Enter name deck.</p>
-
-    <form action="{{ url_for('decks') }}", method="POST">
-        {{ displayField(form.deck_name, 'deck name', autocomplete="off", autofocus=true) }}
-        <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-warning">
+    {{ displayNav() }}
+    <div class="container justify-content-md-center">
+        <h2>Decks!</h2>
+        <p>All your decks:</p>
+        <div class="container-fluid">
+            {# в цикле проходимся по контексту `context.users` #}
+            {% for deck in user_decks %}
+            <div class="row border-bottom">
+                <div class="col-8 my-auto">{{ deck }}</div>
+                <div class="col-4 my-auto">
+                    <div class="dropdown">
+                        <div style="float:right;">
+                            <button class="btn btn-link text-underline-hover dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                Редактировать
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <form action="{{ url_for('delete') }}" method="post">
+                                    <li><button class='dropdown-item' name="rename" value="{{ deck }}" type="submit">Переименовать</button></li>
+                                    <li><button class='dropdown-item' name="delete" value="{{ deck }}" type="submit">Удалить</button></li>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {{ form.csrf_token }}
-    </form>
+
+        <form class="row mt-3 justify-content-md-left" action="{{ url_for('decks') }}", method="POST">
+            <div class="col-md-auto themed-grid-col">
+                <p>Новая колода:</p>
+            </div>
+            <div class="col-4 themed-grid-col">
+                <input autocomplete="off" class="form-control" id="deck_name" maxlength="25" minlength="1" name="deck_name" placeholder="Название колоды" required="" type="text" value="">            </div>
+            <div class="col-4 themed-grid-col">
+                <div class="form-group">
+                    <input type="submit" value="Создать" class="btn btn-outline-primary">
+                </div>
+            </div>
+            {{ form.csrf_token }}
+        </form>
+    </div>
 
 {% endblock %}

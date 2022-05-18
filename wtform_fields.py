@@ -42,10 +42,19 @@ class LoginForm(FlaskForm):
 
 
 class DeckForm(FlaskForm):
-    """ Form for create deck"""
+    """ Form for create deck """
 
-    deck_name = StringField('deck_name', validators=[InputRequired(message="Username required"), Length(min=1, max=25, message="Username must be between 1 and 25 characters")])
+    deck_name = StringField('deck_name', validators=[InputRequired(message="Deck name required"), Length(min=1, max=25, message="Deck name must be between 1 and 25 characters")])
     def validate_deck_name(self, deck_name):
         user_object = Deck.query.filter_by(deck_name=deck_name.data).first()
         if user_object:
             raise ValidationError("Deck name already exists. Select a different deck name.")
+
+
+class NoteForm(FlaskForm):
+    """ Form for create note """
+
+    # type = StringField('type', validators=[InputRequired(message="Type name required"), Length(min=1, max=20, message="Type must be between 1 and 20 characters")])
+    # deck_name = StringField('deck_name', validators=[InputRequired(message="Deck name required"), Length(min=1, max=25, message="Deck name must be between 1 and 25 characters")])
+    front = StringField('front', validators=[InputRequired(message="Front required"), Length(min=1, max=200, message="Front must be between 1 and 200 characters")])
+    back = StringField('back', validators=[InputRequired(message="Back required"), Length(min=1, max=200, message="Back must be between 1 and 200 characters")])

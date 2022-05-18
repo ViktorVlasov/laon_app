@@ -96,6 +96,41 @@ def delete():
         # return "test"
         return redirect(url_for('decks'))
 
+@app.route("/add", methods=['GET', 'POST'])
+def add():
+    if not current_user.is_authenticated:
+        flash('Please login', 'danger')
+        return redirect(url_for('login'))
+
+    note_form = NoteForm()
+    user_id = int(current_user.get_id())
+
+    if (request.method == "POST") and note_form.validate_on_submit():
+        # get data from request and fill the field
+        front = note_form.front.data
+        back = note_form.back.data
+        deck_name = request.form.get('deck_name')
+        deck_id = Deck.query.filter_by(deck_name=deck_name).first().id
+        type_note = request.form.get('type_note')
+        date = None
+        # print(f"front={front}, back={back}, deck_id={deck_id}, type_note={type_note}, date={date}")
+
+        # add note to db
+        note_object = Note(front=front, back=back, deck_id=deck_id, type_note=type_note, repeat_date=date)
+        db.session.add(note_object)
+        db.session.commit()
+        flash(f'Note for {deck_name} created.', 'success')
+        # return render_template("add.html", form=note_form)
+
+    user_decks = [deck.deck_name for deck in User.query.get(user_id).decks]
+
+    # Способ отобразить колоды
+    # print(User.query.get(3).decks[0].deck_name)
+    # return render_template("decks.html", form=deck_form, user_decks=user_decks)
+
+    return render_template("add.html", form=note_form, user_decks=user_decks)
+
+
 @app.route("/logout", methods=['GET'])
 def logout():
 
@@ -103,6 +138,7 @@ def logout():
     logout_user()
     flash('You have logged out successfully', 'success')
     return redirect(url_for('login'))
+
 
 
 if __name__ == '__main__':

@@ -10,7 +10,6 @@
         <h2>Decks!</h2>
         <p>All your decks:</p>
         <div class="container-fluid">
-            {# в цикле проходимся по контексту `context.users` #}
             {% for deck in user_decks %}
             <div class="row border-bottom">
                 <div class="col-8 my-auto">{{ deck }}</div>

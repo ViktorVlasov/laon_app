@@ -12,7 +12,7 @@
         <div class="container-fluid">
             {% for deck in user_decks %}
             <div class="row border-bottom">
-                <div class="col-8 my-auto">{{ deck }}</div>
+                <div class="col-8 my-auto"><a href="user/{{deck}}" class="text-underline-hover">{{ deck }}</a></div>
                 <div class="col-4 my-auto">
                     <div class="dropdown">
                         <div style="float:right;">

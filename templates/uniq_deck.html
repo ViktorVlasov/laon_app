@@ -1,0 +1,36 @@
+{% from 'nav-macro.html' import displayNav %}
+{% extends "prelogin-layout.html" %}
+
+{% block title %}Decks {% endblock %}
+
+{% block content %}
+    {{ displayNav() }}
+    <div class="container justify-content-md-center">
+        <h2>{{Deck_name}}</h2>
+        <p>Notes:</p>
+        <div class="container-fluid">
+            {% for note in notes_front %}
+            <div class="row border-bottom">
+                <div class="col-8 my-auto">{{ note }}</div>
+                <div class="col-4 my-auto">
+                    <div class="dropdown">
+                        <div style="float:right;">
+                            <button class="btn btn-link text-underline-hover dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                Редактировать
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                <form action="#" method="post">
+                                    <li><button class='dropdown-item' name="rename" value="{{ note }}" type="submit">Переименовать</button></li>
+                                    <li><button class='dropdown-item' name="delete" value="{{ note }}" type="submit">Удалить</button></li>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}

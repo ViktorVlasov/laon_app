@@ -122,6 +122,7 @@ def add():
         flash(f'Note for {deck_name} created.', 'success')
         # return render_template("add.html", form=note_form)
 
+    print(User.query.get(user_id).decks)
     user_decks = [deck.deck_name for deck in User.query.get(user_id).decks]
 
     # Способ отобразить колоды
@@ -130,6 +131,20 @@ def add():
 
     return render_template("add.html", form=note_form, user_decks=user_decks)
 
+@app.route("/user/<string:name_deck>", methods=['GET', 'POST'])
+def uniq_deck(name_deck):
+    deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
+    notes = Note.query.filter_by(deck_id=deck_id).all()
+    notes_front = [note.front for note in notes]
+
+    return render_template("uniq_deck.html", notes_front=notes_front, Deck_name=name_deck)
+
+@app.route("/learn", methods=['GET', 'POST'])
+def learn():
+    user_id = int(current_user.get_id())
+    user_decks = [deck.deck_name for deck in User.query.get(user_id).decks]
+
+    return render_template("learn.html", user_decks=user_decks)
 
 @app.route("/logout", methods=['GET'])
 def logout():

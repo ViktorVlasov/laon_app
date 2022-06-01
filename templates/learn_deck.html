@@ -1,0 +1,116 @@
+{% from 'nav-macro.html' import displayNav %}
+{% extends "prelogin-layout.html" %}
+
+{% block title %}Decks {% endblock %}
+
+{% block content %}
+    {{ displayNav() }}
+
+    <div class="container justify-content-md-center">
+        <h2>{{Deck_name}}</h2>
+        <p>Notes:</p>
+        <div class="container-fluid">
+<!--            <div class="row">-->
+<!--            {% for note in notes_front %}-->
+<!--                <div class="col-12">{{ note }}</div>-->
+<!--                </div>-->
+<!--            {% endfor %}-->
+<!--            </div>-->
+            <form action="/get_note" method="post" name="form">
+                <input hidden id="deck_name" name="deck_name" value="{{Deck_name}}" type="text">
+                <input id="note_number" name="note_number" value="0" type="text">
+                <input type="button" value="Предыдущая карточка" onclick="prev_note();">
+                <input type="button" value="Следующая карточка" onclick="next_note();">
+            </form>
+
+
+            <div id="note_front"></div>
+            <div id="note_back"></div>
+            <div id="checker" class="0"></div>
+            <button type="submit" id="change_note" onclick="change();">Перевернуть карточку</button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        function change() {
+            var note_front = $('#note_front');
+            var note_back = $('#note_back');
+            var check = $('#checker');
+
+            if (check.attr('class') === '0')
+            {
+                note_front.html(note_front.attr('class'))
+                note_back.html('')
+                check.attr('class', "1")
+            }
+            else
+            {
+                note_back.html(note_back.attr('class'))
+                note_front.html('')
+                check.attr('class', "0")
+            }
+        }
+
+        function next_note() {
+            $.ajax({
+                type: "POST",
+                url: "/get_note",
+                data: $('form').serialize(),
+                success: function(response) {
+                    var json = jQuery.parseJSON(response);
+                    var upd = +$('#note_number').val() + 1;
+                    var notes_len = json.notes_len;
+
+                    $('#note_front').attr('class', json.notes_front);
+                    $('#note_back').attr('class', json.notes_back);
+                    $('#note_number').val( upd < (notes_len - 1) ? upd : (notes_len - 1));
+
+                    var note_front = $('#note_front');
+                    var note_back = $('#note_back');
+                    var check = $('#checker');
+                    note_front.html(note_front.attr('class'))
+                    note_back.html('')
+                    check.attr('class', "1")
+
+                    console.log(response);
+                    console.log(json);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function prev_note() {
+            $.ajax({
+                type: "POST",
+                url: "/get_note_prev",
+                data: $('form').serialize(),
+                success: function(response) {
+                    var json = jQuery.parseJSON(response);
+                    var upd = +$('#note_number').val() - 1;
+
+                    $('#note_front').attr('class', json.notes_front);
+                    $('#note_back').attr('class', json.notes_back);
+                    $('#note_number').val( upd>0 ? upd : 0);
+
+                    var note_front = $('#note_front');
+                    var note_back = $('#note_back');
+                    var check = $('#checker');
+                    note_front.html(note_front.attr('class'))
+                    note_back.html('')
+                    check.attr('class', "1")
+
+                    console.log(response);
+                    console.log(json);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+{% endblock %}

@@ -5,36 +5,141 @@
 
 {% block content %}
     {{ displayNav() }}
+    <script>
+        function get_next_note() {
+            $.ajax({
+                type: "POST",
+                url: "/get_note_next",
+                data: $('#main_form').serialize(),
+                success: function(response) {
+                    var json = jQuery.parseJSON(response);
 
+                    var note_front = $('#note_front');
+                    var note_back = $('#note_back');
+                    var check = $('#checker');
+
+                    note_front.attr('class', json.notes_front);
+                    note_back.attr('class', json.notes_back);
+                    $('#note_number').val(json.notes_number);
+
+                    note_front.html(note_front.attr('class'))
+                    note_back.html('')
+                    check.attr('class', "1")
+
+                    console.log(response);
+                    console.log(json);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function get_prev_note() {
+            $.ajax({
+                type: "POST",
+                url: "/get_note_prev",
+                data: $('#main_form').serialize(),
+                success: function(response) {
+                    var json = jQuery.parseJSON(response);
+
+                    var note_front = $('#note_front');
+                    var note_back = $('#note_back');
+                    var check = $('#checker');
+
+                    note_front.attr('class', json.notes_front);
+                    note_back.attr('class', json.notes_back);
+                    $('#note_number').val(json.notes_number);
+
+                    note_front.html(note_front.attr('class'))
+                    note_back.html('')
+                    check.attr('class', "1")
+
+                    console.log(response);
+                    console.log(json);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
     <div class="container justify-content-md-center">
         <h2>{{Deck_name}}</h2>
-        <p>Notes:</p>
-        <div class="container-fluid">
-<!--            <div class="row">-->
-<!--            {% for note in notes_front %}-->
-<!--                <div class="col-12">{{ note }}</div>-->
-<!--                </div>-->
-<!--            {% endfor %}-->
-<!--            </div>-->
-            <form action="/get_note" method="post" name="form">
-                <input hidden id="deck_name" name="deck_name" value="{{Deck_name}}" type="text">
-                <input id="note_number" name="note_number" value="0" type="text">
-                <input type="button" value="Предыдущая карточка" onclick="prev_note();">
-                <input type="button" value="Следующая карточка" onclick="next_note();">
+        <div class="container mt-2">
+
+            <div class="form-wrapper d-flex justify-content-center">
+                <form action="/get_note_next" method="post" name="form" id="main_form">
+                    <input hidden id="deck_name" name="deck_name" value="{{Deck_name}}" type="text">
+                    <input hidden id="note_number" name="note_number" value="0" type="text">
+                    <input hidden class="btn btn-primary" id="prev_note" type="button" value="Предыдущая карточка" onclick="get_prev_note();">
+                    <input hidden class="btn btn-primary" id="next_note" type="button" value="Следующая карточка" onclick="get_next_note();">
+                </form>
+            </div>
+
+            <div hidden id="note-wrapper" class="note-wrapper row my-2" style="height: 150px; text-align: center;">
+                <div hidden class="border col-4 mx-auto pt-5" id="btn-wrapper">
+                    <div id="note_front"></div>
+                    <div id="note_back"></div>
+                </div>
+            </div>
+
+            <div class="change-wrapper d-flex justify-content-center">
+                <div>
+                    <div hidden id="checker" class="0"></div>
+                    <button hidden class="btn btn-primary" type="submit" id="change_note" onclick="change();">Перевернуть карточку</button>
+                </div>
+            </div>
+
+            <form action="/get_note_start" method="post" id="start_form" name="start_form">
+                <input hidden name="deck_name" value="{{Deck_name}}" type="text">
+                <input hidden name="note_number" value="0" type="text">
+                <input class="btn btn-primary" id="start_button" type="button" value="Начать тренировку" onclick="start();">
             </form>
-
-
-            <div id="note_front"></div>
-            <div id="note_back"></div>
-            <div id="checker" class="0"></div>
-            <button type="submit" id="change_note" onclick="change();">Перевернуть карточку</button>
-
         </div>
 
     </div>
 
     <script>
+        function start() {
+            $.ajax({
+                type: "POST",
+                url: "/get_note_start",
+                data: $('#start_form').serialize(),
+                success: function(response) {
+                    // $('#note_number').removeAttr('hidden')
+                    $('#prev_note').removeAttr('hidden');
+                    $('#next_note').removeAttr('hidden');
+                    $('#change_note').removeAttr('hidden');
+                    $('#btn-wrapper').removeAttr('hidden');
+                    $('#note-wrapper').removeAttr('hidden');
+                    $('#start_form').html('');
 
+                    var json = jQuery.parseJSON(response);
+
+                    $('#note_front').attr('class', json.notes_front);
+                    $('#note_back').attr('class', json.notes_back);
+
+                    var note_front = $('#note_front');
+                    var note_back = $('#note_back');
+                    var check = $('#checker');
+                    note_front.html(note_front.attr('class'))
+                    note_back.html('')
+                    check.attr('class', "1")
+
+                    console.log(response);
+                    console.log(json);
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+
+    <script>
         function change() {
             var note_front = $('#note_front');
             var note_back = $('#note_back');
@@ -52,65 +157,6 @@
                 note_front.html('')
                 check.attr('class', "0")
             }
-        }
-
-        function next_note() {
-            $.ajax({
-                type: "POST",
-                url: "/get_note",
-                data: $('form').serialize(),
-                success: function(response) {
-                    var json = jQuery.parseJSON(response);
-                    var upd = +$('#note_number').val() + 1;
-                    var notes_len = json.notes_len;
-
-                    $('#note_front').attr('class', json.notes_front);
-                    $('#note_back').attr('class', json.notes_back);
-                    $('#note_number').val( upd < (notes_len - 1) ? upd : (notes_len - 1));
-
-                    var note_front = $('#note_front');
-                    var note_back = $('#note_back');
-                    var check = $('#checker');
-                    note_front.html(note_front.attr('class'))
-                    note_back.html('')
-                    check.attr('class', "1")
-
-                    console.log(response);
-                    console.log(json);
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
-        }
-
-        function prev_note() {
-            $.ajax({
-                type: "POST",
-                url: "/get_note_prev",
-                data: $('form').serialize(),
-                success: function(response) {
-                    var json = jQuery.parseJSON(response);
-                    var upd = +$('#note_number').val() - 1;
-
-                    $('#note_front').attr('class', json.notes_front);
-                    $('#note_back').attr('class', json.notes_back);
-                    $('#note_number').val( upd>0 ? upd : 0);
-
-                    var note_front = $('#note_front');
-                    var note_back = $('#note_back');
-                    var check = $('#checker');
-                    note_front.html(note_front.attr('class'))
-                    note_back.html('')
-                    check.attr('class', "1")
-
-                    console.log(response);
-                    console.log(json);
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });
         }
     </script>
 {% endblock %}

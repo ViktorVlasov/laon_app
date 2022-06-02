@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'replace later'
 
 # Configure database
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql://zhscioljszglrn:0ee730cd5eeedd19f75ff84e2a8306ece4dcb38ab15667be11f21c69588844ea@ec2-52-18-116-67.eu-west-1.compute.amazonaws.com:5432/d4p3lejs4u467o'
+app.config['SQLALCHEMY_DATABASE_URI']='postgresql://lxwvizyttgkgqf:8bb45888158e3468b011f6742ea3a84c91494679be1155bc5ff58e0aa72f5bf2@ec2-54-228-125-183.eu-west-1.compute.amazonaws.com:5432/d7eb449u08v2c7'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -179,57 +179,49 @@ def logout():
     flash('You have logged out successfully', 'success')
     return redirect(url_for('login'))
 
-@app.route('/get_note_start', methods=['POST'])
-def get_note_start():
-    print(request.form)
-
-    return json.dumps({'notes_front': 123})
-                      #                    'notes_back': notes_back[note_number],
-                      #                    'notes_len': len(notes_front)})
-    # name_deck = request.form.get('deck_name')
-    # note_number = int(request.form.get('note_number'))
-    # deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
-    # notes = Note.query.filter_by(deck_id=deck_id).all()
-    # notes_front = [note.front for note in notes]
-    # notes_back = [note.back for note in notes]
-    #
-    # return json.dumps({'notes_front': notes_front[note_number],
-    #                    'notes_back': notes_back[note_number],
-    #                    'notes_len': len(notes_front)})
-
-@app.route('/get_note', methods=['GET', 'POST'])
-def get_note():
-    name_deck = request.form.get('deck_name')
-    note_number = int(request.form.get('note_number'))
+def get_notes_value(name_deck):
     deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
     notes = Note.query.filter_by(deck_id=deck_id).all()
     notes_front = [note.front for note in notes]
     notes_back = [note.back for note in notes]
+    return (notes_front, notes_back)
 
-    return json.dumps({'notes_front': notes_front[note_number],
-                      'notes_back': notes_back[note_number],
+@app.route('/get_note_start', methods=['GET', 'POST'])
+def get_note_start():
+    print(request.form)
+
+    name_deck = request.form.get('deck_name')
+    notes_front, notes_back = get_notes_value(name_deck)
+
+    return json.dumps({'notes_front': notes_front[0],
+                       'notes_back': notes_back[0],
                        'notes_len': len(notes_front)})
 
-    # return json.dumps({'notes_front': notes_front,
-    #                    'notes_back': notes_back})
+@app.route('/get_note_next', methods=['GET', 'POST'])
+def get_note_next():
+    name_deck = request.form.get('deck_name')
+    note_number_next = int(request.form.get('note_number')) + 1
+    notes_front, notes_back = get_notes_value(name_deck)
+
+    if note_number_next >= len(notes_front):
+        note_number_next = len(notes_front) - 1
+
+    return json.dumps({'notes_front': notes_front[note_number_next],
+                      'notes_back': notes_back[note_number_next],
+                       'notes_number': note_number_next})
+
 
 @app.route('/get_note_prev', methods=['GET', 'POST'])
 def get_note_prev():
     name_deck = request.form.get('deck_name')
-    note_number = int(request.form.get('note_number')) - 1
-    if note_number < 0:
-        note_number = 0
-    deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
-    notes = Note.query.filter_by(deck_id=deck_id).all()
-    notes_front = [note.front for note in notes]
-    notes_back = [note.back for note in notes]
+    note_number_prev = int(request.form.get('note_number')) - 1
+    if note_number_prev < 0:
+        note_number_prev = 0
+    notes_front, notes_back = get_notes_value(name_deck)
 
-    return json.dumps({'notes_front': notes_front[note_number],
-                      'notes_back': notes_back[note_number],
-                       'notes_len': len(notes_front)})
-
-    # return json.dumps({'notes_front': notes_front,
-    #                    'notes_back': notes_back})
+    return json.dumps({'notes_front': notes_front[note_number_prev],
+                      'notes_back': notes_back[note_number_prev],
+                       'notes_number': note_number_prev})
 
 
 

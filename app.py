@@ -142,11 +142,13 @@ def uniq_deck(name_deck):
         flash('Please login', 'danger')
         return redirect(url_for('login'))
 
-    deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
-    notes = Note.query.filter_by(deck_id=deck_id).all()
-    notes_front = [note.front for note in notes]
+    notes_front, notes_back = get_notes_value(name_deck)
+    notes = []
+    for i in range(len(notes_front)):
+        notes.append([notes_front[i], notes_back[i]])
 
-    return render_template("uniq_deck.html", notes_front=notes_front, Deck_name=name_deck)
+
+    return render_template("uniq_deck.html", notes=notes, Deck_name=name_deck)
 
 @app.route("/learn", methods=['GET', 'POST'])
 def learn():
@@ -156,6 +158,7 @@ def learn():
 
     if request.method == "POST":
         name_deck = request.form.get('deck_name')
+
         deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
         notes = Note.query.filter_by(deck_id=deck_id).all()
         notes_front = [note.front for note in notes]

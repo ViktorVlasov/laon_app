@@ -7,13 +7,13 @@
 {% block content %}
     {{ displayNav() }}
     <div class="container justify-content-md-center">
-        <h2>Add note!</h2>
+        <h2>Добавить карточку!</h2>
 
         <form class="mt-3 justify-content-md-left" action="{{ url_for('add') }}", method="POST">
 
             <div class="row mt-3">
                 <div class="col-2 themed-grid-col">
-                    <p>Deck</p>
+                    <p>Колода</p>
                 </div>
                 <div class="col-10 themed-grid-col">
                     <select name="deck_name" class="form-select" aria-label="Default select example">
@@ -27,31 +27,31 @@
 
             <div class="row mt-3">
                 <div class="col-2 themed-grid-col">
-                    <p>Type</p>
+                    <p>Тип карточки</p>
                 </div>
                 <div class="col-10 themed-grid-col">
                     <select name="type_note" class="form-select" aria-label="Default select example 2">
-                        <option value="Basic">Basic</option>
-                        <option value="test">test</option>
+                        <option value="Basic">Базовый</option>
+                        <option value="test">Тестовый</option>
                     </select>
                 </div>
             </div>
 
             <div class="row mt-3">
                 <div class="col-2 themed-grid-col">
-                    <p>Front</p>
+                    <p>Лицевая сторона</p>
                 </div>
                 <div class="col-10 themed-grid-col">
-                    <input autocomplete="off" class="form-control" id="front" maxlength="200" minlength="1" name="front" placeholder="Front" required="" type="text" value="">
+                    <input autocomplete="off" class="form-control" id="front" maxlength="200" minlength="1" name="front" placeholder="Лицо" required="" type="text" value="">
                 </div>
             </div>
 
             <div class="row mt-3">
                 <div class="col-2 themed-grid-col">
-                    <p>Back</p>
+                    <p>Оборотная сторона</p>
                 </div>
                 <div class="col-10 themed-grid-col">
-                    <input autocomplete="off" class="form-control" id="back" maxlength="200" minlength="1" name="back" placeholder="Back" required="" type="text" value="">
+                    <input autocomplete="off" class="form-control" id="back" maxlength="200" minlength="1" name="back" placeholder="Оборот" required="" type="text" value="">
                 </div>
             </div>
 

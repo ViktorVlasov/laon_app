@@ -9,9 +9,9 @@
         <p>Первый раз здесь? Зарегистрируйтесь, чтобы использовать Laon!</p>
 
         <form action="{{ url_for('index') }}", method="POST">
-            {{ displayField(form.username, 'Username', autocomplete="off", autofocus=true) }}
-            {{ displayField(form.password, 'Password') }}
-            {{ displayField(form.confirm_pswd, 'Retype Password') }}
+            {{ displayField(form.username, 'Имя пользователя', autocomplete="off", autofocus=true) }}
+            {{ displayField(form.password, 'Пароль') }}
+            {{ displayField(form.confirm_pswd, 'Повторите пароль') }}
             <div class="form-group">
                 <input type="submit" value="Создать" class="w-100 btn btn-lg btn-primary">
             </div>

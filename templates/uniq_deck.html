@@ -9,9 +9,10 @@
         <h2>{{Deck_name}}</h2>
         <p>Notes:</p>
         <div class="container-fluid">
-            {% for note in notes_front %}
+            {% for note in notes %}
             <div class="row border-bottom">
-                <div class="col-8 my-auto">{{ note }}</div>
+                <div class="col-4 my-auto"><label>Лицевая сторона: </label> <input id="note_front" name="note_number" value={{ note[0] }} type="text"></div>
+                <div class="col-4 my-auto"><label>Оборотная сторона: </label> <input id="note_back" name="note_number" value={{ note[1] }} type="text"></div>
                 <div class="col-4 my-auto">
                     <div class="dropdown">
                         <div style="float:right;">

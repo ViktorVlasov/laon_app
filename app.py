@@ -136,6 +136,13 @@ def add():
 
     return render_template("add.html", form=note_form, user_decks=user_decks)
 
+def get_notes_value(name_deck):
+    deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
+    notes = Note.query.filter_by(deck_id=deck_id).all()
+    notes_front = [note.front for note in notes]
+    notes_back = [note.back for note in notes]
+    return notes_front, notes_back
+
 @app.route("/user/<string:name_deck>", methods=['GET', 'POST'])
 def uniq_deck(name_deck):
     if not current_user.is_authenticated:
@@ -159,12 +166,15 @@ def learn():
     if request.method == "POST":
         name_deck = request.form.get('deck_name')
 
-        deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
-        notes = Note.query.filter_by(deck_id=deck_id).all()
-        notes_front = [note.front for note in notes]
-        notes_back = [note.back for note in notes]
+        type_of_learn = request.form.get('type_learn')
+        print(type_of_learn)
+        notes_front, notes_back = get_notes_value(name_deck)
 
-        return render_template("learn_deck.html", notes_front=notes_front, notes_back=notes_back, Deck_name=name_deck)
+        if type_of_learn == "Entering":
+            return render_template("learn_deck_entering.html", notes_front=notes_front, notes_back=notes_back, Deck_name=name_deck)
+        else:
+            return render_template("learn_deck.html", notes_front=notes_front, notes_back=notes_back, Deck_name=name_deck)
+
 
     user_id = int(current_user.get_id())
     user_decks = [deck.deck_name for deck in User.query.get(user_id).decks]
@@ -182,13 +192,6 @@ def logout():
     flash('You have logged out successfully', 'success')
     return redirect(url_for('login'))
 
-def get_notes_value(name_deck):
-    deck_id = Deck.query.filter_by(deck_name=name_deck).first().id
-    notes = Note.query.filter_by(deck_id=deck_id).all()
-    notes_front = [note.front for note in notes]
-    notes_back = [note.back for note in notes]
-    return (notes_front, notes_back)
-
 @app.route('/get_note_start', methods=['GET', 'POST'])
 def get_note_start():
     print(request.form)
@@ -203,15 +206,27 @@ def get_note_start():
 @app.route('/get_note_next', methods=['GET', 'POST'])
 def get_note_next():
     name_deck = request.form.get('deck_name')
-    note_number_next = int(request.form.get('note_number')) + 1
+
+    note_number_cur = int(request.form.get('note_number'))
+    entering_value = request.form.get('entering_value')
+
+    note_number_next = note_number_cur + 1
     notes_front, notes_back = get_notes_value(name_deck)
+
+    is_true_entering = 0
+    if entering_value.lower() in notes_back[note_number_cur].lower():
+        is_true_entering = 1
+    else:
+        is_true_entering = 0
+
 
     if note_number_next >= len(notes_front):
         note_number_next = len(notes_front) - 1
 
     return json.dumps({'notes_front': notes_front[note_number_next],
                       'notes_back': notes_back[note_number_next],
-                       'notes_number': note_number_next})
+                       'notes_number': note_number_next,
+                       'is_true_entering': is_true_entering})
 
 
 @app.route('/get_note_prev', methods=['GET', 'POST'])
